@@ -21,6 +21,8 @@ from HashGenerator.ui.widgets.ClickableLineEdit import ClickableLineEdit
 class MainWindow(BaseWindow):
     def __init__(self):
         super().__init__()
+        self.dir = ""
+        self.fileName = ""
         self.initUI()
         self.show()
 
@@ -52,6 +54,8 @@ class MainWindow(BaseWindow):
         self.generatorButton.setText("Generator")
         self.generatorButton.move(180, 110)
         self.generatorButton.resize(100, 28)
+        self.generatorButton.setEnabled(False)
+        self.generatorButton.clicked.connect(self.onGeneratorClicked)
 
         # self.initMenuBar()
         # self.initLayout()
@@ -62,6 +66,8 @@ class MainWindow(BaseWindow):
         self.dir = QFileDialog.getExistingDirectory(self, "选取文件夹", os.getcwd())
         if self.dir != "":
             self.targetDirLineEdit.setText(self.dir)
+        if self.dir != "" and self.fileName != "":
+            self.generatorButton.setEnabled(True)
 
     @pyqtSlot()
     def onOutputClicked(self):
@@ -71,3 +77,12 @@ class MainWindow(BaseWindow):
                                                           "Excel File (*.xlsx)")
         if self.fileName != "":
             self.outputExcelLineEdit.setText(self.fileName)
+        if self.dir != "" and self.fileName != "":
+            self.generatorButton.setEnabled(True)
+
+    @pyqtSlot()
+    def onGeneratorClicked(self):
+        self.dir = self.targetDirLineEdit.text()
+        self.fileName = self.outputExcelLineEdit.text()
+        pass
+
