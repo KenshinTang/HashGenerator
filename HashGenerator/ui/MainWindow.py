@@ -9,7 +9,7 @@ XulDebugTool
 author: Kenshin
 last edited: 2019.06.10
 """
-
+import hashlib
 import os
 from PyQt5.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QFileDialog
 from PyQt5.QtCore import Qt, pyqtSlot
@@ -54,7 +54,7 @@ class MainWindow(BaseWindow):
         self.generatorButton.setText("Generator")
         self.generatorButton.move(180, 110)
         self.generatorButton.resize(100, 28)
-        self.generatorButton.setEnabled(False)
+        # self.generatorButton.setEnabled(False)
         self.generatorButton.clicked.connect(self.onGeneratorClicked)
 
         # self.initMenuBar()
@@ -66,8 +66,8 @@ class MainWindow(BaseWindow):
         self.dir = QFileDialog.getExistingDirectory(self, "选取文件夹", os.getcwd())
         if self.dir != "":
             self.targetDirLineEdit.setText(self.dir)
-        if self.dir != "" and self.fileName != "":
-            self.generatorButton.setEnabled(True)
+        # if self.dir != "" and self.fileName != "":
+        #     self.generatorButton.setEnabled(True)
 
     @pyqtSlot()
     def onOutputClicked(self):
@@ -77,12 +77,24 @@ class MainWindow(BaseWindow):
                                                           "Excel File (*.xlsx)")
         if self.fileName != "":
             self.outputExcelLineEdit.setText(self.fileName)
-        if self.dir != "" and self.fileName != "":
-            self.generatorButton.setEnabled(True)
+        # if self.dir != "" and self.fileName != "":
+        #     self.generatorButton.setEnabled(True)
 
     @pyqtSlot()
     def onGeneratorClicked(self):
         self.dir = self.targetDirLineEdit.text()
         self.fileName = self.outputExcelLineEdit.text()
-        pass
+        self.md5map = {}
+        for file in os.listdir(self.dir):
+            path = os.path.join(self.dir, file)
+            if os.path.isfile(path):
+                self.md5map[file] = self.getMd5(path)
+        print(self.md5map)
 
+    def getMd5(self, file_path):
+        f = open(file_path, 'rb')
+        md5Obj = hashlib.md5()
+        md5Obj.update(f.read())
+        md5 = str(md5Obj.hexdigest()).lower()
+        f.close()
+        return md5
